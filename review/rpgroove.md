@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 255 Words About Rhythm Paradise Groove
-permalink: /reviews/rpgroove
+title: Thoughts on Rhythm Paradise Groove
+permalink: /review/rpgroove
 ---
 
 ![A screenshot of four little umbrella guys](rpgroove.png "The best little guys")
