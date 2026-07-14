@@ -18,7 +18,7 @@ I've been doing GameJam's since 2013 with a whole bunch of different people, the
 * [**Village Simulation Game (2019)**](https://horsehead.itch.io/village-simulation-game) - Start With Nothing
 
 ## Global GameJam
-* [**Am I Tape? (2026)**](https://aryl-ether.itch.io/csi) - Mask
+* [**Am I Tape? (2026)**](https://joe-shanahan.itch.io/am-i-tape) - Mask
 * [**What Can I Get You? (2025)**](https://gremalino.itch.io/what-can-i-get-you) - Bubble
 * [**CSI: Clown Scene Investigation (2024)**](https://aryl-ether.itch.io/csi) - Make Me Laugh
 * [**Tiny Tree (2023)**](https://horsehead.itch.io/tiny-tree) - Roots
