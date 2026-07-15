@@ -27,8 +27,21 @@
         border-bottom: 1px solid #ddd;
     }
 
-    #gameGrid {
+    .groupHeader {
+        font-size: 24px;
+        margin: 20px 10px 10px;
+        color: #333;
+    }
+
+    .groupGrid {
         display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+        padding: 10px 20px 30px;
+    }
+
+    #gameGrid {
+        display: block;
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 20px;
         padding: 20px;
@@ -72,12 +85,15 @@
         background: white;
         padding: 20px;
         max-width: 600px;
+        max-height: 90vh;     /* modal never exceeds screen height */
+        overflow-y: auto;     /* scroll inside modal if needed */
         border-radius: 10px;
-        box-shadow: 0 0 20px black;
     }
 
     #modalContent img {
         width: 100%;
+        max-height: 40vh;     /* prevents portrait images from being too tall */
+        object-fit: contain;  /* keeps aspect ratio */
         border-radius: 8px;
     }
 
@@ -87,6 +103,33 @@
         font-size: 20px;
         font-weight: bold;
     }
+
+@media (max-width: 600px) {
+    #modalContent {
+        width: 90%;
+        padding: 15px;
+    }
+
+    #gameGrid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    header {
+        font-size: 24px;
+        padding: 15px;
+    }
+
+    #closeModal {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 5px;
+    }
+
+    .groupGrid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
 </style>
 </head>
 <body>
@@ -98,6 +141,7 @@
     <select id="sortSelect">
         <option value="name">Sort by name</option>
         <option value="year">Sort by year</option>
+        <option value="category">Sort by category</option>
     </select>
 </div>
 
@@ -120,20 +164,55 @@ async function loadGames() {
     return games;
 }
 
-function renderGames(games) {
+function renderGames(games, groupBy = null) {
     const grid = document.getElementById("gameGrid");
     grid.innerHTML = "";
 
+    if (!groupBy) {
+        // Flat list
+        const flatGrid = document.createElement("div");
+        flatGrid.className = "groupGrid";
+        games.forEach(game => flatGrid.appendChild(createGameCard(game)));
+        grid.appendChild(flatGrid);
+        return;
+    }
+
+    // Grouping
+    const groups = {};
     games.forEach(game => {
-        const card = document.createElement("div");
-        card.className = "gameCard";
-        card.innerHTML = `
-            <img src="${game.image}">
-            <div class="title">${game.name}</div>
-        `;
-        card.onclick = () => openModal(game);
-        grid.appendChild(card);
+        const key = game[groupBy];
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(game);
     });
+
+    Object.keys(groups).sort().forEach(groupName => {
+        // Header
+        const header = document.createElement("h2");
+        header.textContent = groupName;
+        header.className = "groupHeader";
+        grid.appendChild(header);
+
+        // Grid for this group
+        const groupContainer = document.createElement("div");
+        groupContainer.className = "groupGrid";
+
+        groups[groupName].forEach(game => {
+            groupContainer.appendChild(createGameCard(game));
+        });
+
+        grid.appendChild(groupContainer);
+    });
+}
+
+function createGameCard(game) {
+    const card = document.createElement("div");
+    card.className = "gameCard";
+    card.innerHTML = `
+        <img src="${game.image}" loading="lazy">
+        <div class="title">${game.name}</div>
+    `;
+    card.onclick = () => openModal(game);
+    return card;
 }
 
 function openModal(game) {
@@ -157,9 +236,12 @@ function applyFilters(games) {
     filtered.sort((a, b) => {
         if (sort === "name") return a.name.localeCompare(b.name);
         if (sort === "year") return a.year - b.year;
+        if (sort === "category") return a.category.localeCompare(b.category);
     });
 
-    renderGames(filtered);
+    const groupBy = (sort === "year" || sort === "category") ? sort : null;
+
+    renderGames(filtered, groupBy);
 }
 
 (async () => {
@@ -170,6 +252,18 @@ function applyFilters(games) {
 
     applyFilters(games);
 })();
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        document.getElementById("modal").style.display = "none";
+    }
+});
+
+document.getElementById("modal").onclick = (e) => {
+    if (e.target === document.getElementById("modal")) {
+        document.getElementById("modal").style.display = "none";
+    }
+};
 </script>
 
 </body>
