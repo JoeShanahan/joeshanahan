@@ -90,39 +90,89 @@
     #modal {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.7);
+        background: rgba(0,0,0,0.85); /* more opaque */
         display: none;
         align-items: center;
         justify-content: center;
+        padding: 20px;
     }
 
+    /* No white box — content floats */
     #modalContent {
-        background: white;
-        padding: 20px;
-        max-width: 600px;
-        max-height: 90vh;     /* modal never exceeds screen height */
-        overflow-y: auto;     /* scroll inside modal if needed */
-        border-radius: 10px;
+        display: flex;
+        gap: 20px;
+        color: white;
+        max-width: 900px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
     }
 
     #modalContent img {
         width: 100%;
-        max-height: 40vh;     /* prevents portrait images from being too tall */
+        max-height: 60vh;     /* prevents portrait images from being too tall */
         object-fit: contain;  /* keeps aspect ratio */
         border-radius: 8px;
     }
 
-    #closeModal {
-        float: right;
-        cursor: pointer;
-        font-size: 20px;
-        font-weight: bold;
+    /* Box art */
+    #modalImage {
+        width: 40%;
+        max-width: 300px;
+        border-radius: 8px;
+        object-fit: contain;
     }
 
-@media (max-width: 600px) {
+    /* Text column */
+    #modalText {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Title */
+    #modalTitle {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    /* Description */
+    #modalDesc {
+        color: #d0d0d0; /* light grey */
+        line-height: 1.5;
+    }
+
+    /* Labels */
+    .modalLabel {
+        font-weight: bold;
+        margin-top: 10px;
+        color: #ffffff;
+    }
+
+    .modalValue {
+        color: #cccccc;
+    }
+
+    /* Close button */
+    #closeModal {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 28px;
+        font-weight: bold;
+        color:white;
+        cursor: pointer;
+        padding: 32px;
+    }
+
+
+@media (max-width: 700px) {
     #modalContent {
-        width: 90%;
-        padding: 15px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
 
     #gameGrid {
@@ -134,15 +184,26 @@
         padding: 15px;
     }
 
-    #closeModal {
-        position: sticky;
-        top: 0;
-        background: white;
-        padding: 5px;
-    }
-
     .groupGrid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    #modalContent img {
+        max-height: 50vh;
+    }
+
+    #modalImage {
+        width: 80%;
+        max-width: none;
+    }
+
+    #modalText {
+        width: 100%;
+    }
+
+    #closeModal {
+        top: 5px;
+        right: 5px;
     }
 }
 </style>
@@ -164,11 +225,25 @@
 
 <!-- Modal -->
 <div id="modal">
+    <span id="closeModal">✖</span>
+
     <div id="modalContent">
-        <span id="closeModal">✖</span>
-        <h2 id="modalTitle"></h2>
         <img id="modalImage">
-        <p id="modalDesc"></p>
+
+        <div id="modalText">
+            <h2 id="modalTitle"></h2>
+            <p id="modalDesc"></p>
+
+            <div>
+                <div class="modalLabel">Release year</div>
+                <div class="modalValue" id="modalYear"></div>
+            </div>
+
+            <div>
+                <div class="modalLabel">Category</div>
+                <div class="modalValue" id="modalCategory"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -242,7 +317,10 @@ function createGameCard(game) {
 function openModal(game) {
     document.getElementById("modalTitle").textContent = game.name;
     document.getElementById("modalImage").src = game.image;
-    document.getElementById("modalDesc").textContent = game.description;
+    document.getElementById("modalDesc").textContent = game.description || "";
+    document.getElementById("modalYear").textContent = game.year || "Unknown";
+    document.getElementById("modalCategory").textContent = game.category || "Unknown";
+
     document.getElementById("modal").style.display = "flex";
 }
 
